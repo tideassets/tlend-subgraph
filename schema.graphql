@@ -1,3 +1,16 @@
+type Candle @entity {
+  # marketAddress:period:timestamp
+  id: ID!
+  marketAddress: String!
+  period: String!
+  timestamp: Int!
+  open: BigInt!
+  close: BigInt!
+  high: BigInt!
+  low: BigInt!
+  # volume: BigInt!
+}
+
 enum OrderStatus {
   Created
   Executed
@@ -80,6 +93,9 @@ type PositionIncrease @entity(immutable: true) {
   collateralTokenAddress: String!
   collateralTokenPriceMin: BigInt!
   collateralTokenPriceMax: BigInt!
+  indexTokenPriceMin: BigInt!
+  indexTokenPriceMax: BigInt!
+  fundingFeeAmountPerSize: BigInt!
   sizeInUsd: BigInt!
   sizeInTokens: BigInt!
   collateralAmount: BigInt!
@@ -87,14 +103,12 @@ type PositionIncrease @entity(immutable: true) {
   sizeDeltaInTokens: BigInt!
   collateralDeltaAmount: BigInt!
   executionPrice: BigInt!
-  priceImpactDiffUsd: BigInt!
   orderType: BigInt!
   borrowingFactor: BigInt!
-  longTokenFundingAmountPerSize: BigInt!
-  shortTokenFundingAmountPerSize: BigInt!
+  longTokenFundingAmountPerSize: BigInt
+  shortTokenFundingAmountPerSize: BigInt
   priceImpactAmount: BigInt!
   priceImpactUsd: BigInt!
-  basePnlUsd: BigInt!
   isLong: Boolean!
 
   transaction: Transaction
@@ -155,6 +169,29 @@ type PositionFeesInfo @entity(immutable: true) {
   affiliateRewardAmount: BigInt!
 
   transaction: Transaction!
+}
+
+type ClaimableCollateral @entity {
+  # account:market:token:timeKey
+  id: ID!
+  account: String!
+  marketAddress: String!
+  tokenAddress: String!
+  timeKey: String!
+  value: BigInt!
+  claimed: Boolean!
+  factor: BigInt!
+  factorByTime: BigInt!
+}
+
+type ClaimableCollateralGroup @entity {
+  # market:token:timeKey
+  id: ID!
+  timeKey: String!
+  marketAddress: String!
+  tokenAddress: String!
+  factor: BigInt!
+  claimables: [ClaimableCollateral!]!
 }
 
 type SwapInfo @entity(immutable: true) {
@@ -252,6 +289,7 @@ type TradeAction @entity(immutable: true) {
   borrowingFeeAmount: BigInt
   fundingFeeAmount: BigInt
   pnlUsd: BigInt
+  basePnlUsd: BigInt
   isLong: Boolean
 
   # swaps
@@ -262,6 +300,7 @@ type TradeAction @entity(immutable: true) {
   reason: String
   reasonBytes: Bytes
 
+  # timestamp: Int
   transaction: Transaction!
 }
 
@@ -271,6 +310,7 @@ type TokenPrice @entity {
 
   minPrice: BigInt!
   maxPrice: BigInt!
+  updateAt: BigInt!
 }
 
 type ClaimCollateralAction @entity(immutable: true) {

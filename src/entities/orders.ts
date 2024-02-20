@@ -1,4 +1,5 @@
 import { Order, Transaction } from "../../generated/schema";
+import { EventData } from "../utils/eventData";
 import { EventData1 } from "../utils/eventData1";
 import { EventData2 } from "../utils/eventData2";
 import { BigInt } from "@graphprotocol/graph-ts";
@@ -14,7 +15,10 @@ orderTypes.set("LimitDecrease", BigInt.fromI32(5));
 orderTypes.set("StopLossDecrease", BigInt.fromI32(6));
 orderTypes.set("Liquidation", BigInt.fromI32(7));
 
-export function saveOrder(eventData: EventData2, transaction: Transaction): Order {
+export function saveOrder(
+  eventData: EventData2,
+  transaction: Transaction
+): Order {
   let key = eventData.getBytes32Item("key")!.toHexString();
 
   let order = new Order(key);
@@ -24,18 +28,24 @@ export function saveOrder(eventData: EventData2, transaction: Transaction): Orde
   order.callbackContract = eventData.getAddressItemString("callbackContract")!;
   order.marketAddress = eventData.getAddressItemString("market")!;
   order.swapPath = eventData.getAddressArrayItemString("swapPath")! || [];
-  order.initialCollateralTokenAddress = eventData.getAddressItemString("initialCollateralToken")!;
+  order.initialCollateralTokenAddress = eventData.getAddressItemString(
+    "initialCollateralToken"
+  )!;
   order.sizeDeltaUsd = eventData.getUintItem("sizeDeltaUsd")!;
-  order.initialCollateralDeltaAmount = eventData.getUintItem("initialCollateralDeltaAmount")!;
+  order.initialCollateralDeltaAmount = eventData.getUintItem(
+    "initialCollateralDeltaAmount"
+  )!;
   order.triggerPrice = eventData.getUintItem("triggerPrice")!;
   order.acceptablePrice = eventData.getUintItem("acceptablePrice")!;
-  order.callbackGasLimit = eventData.getUintItem("callbakGasLimit")!;
+  order.callbackGasLimit = eventData.getUintItem("callbackGasLimit")!;
   order.minOutputAmount = eventData.getUintItem("minOutputAmount")!;
   order.executionFee = eventData.getUintItem("executionFee")!;
   order.updatedAtBlock = eventData.getUintItem("updatedAtBlock")!;
   order.orderType = eventData.getUintItem("orderType")!;
   order.isLong = eventData.getBoolItem("isLong")!;
-  order.shouldUnwrapNativeToken = eventData.getBoolItem("shouldUnwrapNativeToken")!;
+  order.shouldUnwrapNativeToken = eventData.getBoolItem(
+    "shouldUnwrapNativeToken"
+  )!;
 
   let isFrozen = eventData.getBoolItem("isFrozen")!;
 
@@ -51,12 +61,15 @@ export function saveOrder(eventData: EventData2, transaction: Transaction): Orde
   return order;
 }
 
-export function saveOrderCancelledState(eventData: EventData2, transaction: Transaction): Order | null {
+export function saveOrderCancelledState(
+  eventData: EventData2,
+  transaction: Transaction
+): Order | null {
   let key = eventData.getBytes32Item("key")!.toHexString();
 
   let order = Order.load(key);
 
-  if (order === null) {
+  if (!order) {
     return null;
   }
 
@@ -71,12 +84,15 @@ export function saveOrderCancelledState(eventData: EventData2, transaction: Tran
   return order as Order;
 }
 
-export function saveOrderExecutedState(eventData: EventData2, transaction: Transaction): Order | null {
+export function saveOrderExecutedState(
+  eventData: EventData2,
+  transaction: Transaction
+): Order | null {
   let key = eventData.getBytes32Item("key")!.toHexString();
 
   let order = Order.load(key);
 
-  if (order === null) {
+  if (!order) {
     return null;
   }
 
@@ -93,7 +109,7 @@ export function saveOrderFrozenState(eventData: EventData2): Order | null {
 
   let order = Order.load(key);
 
-  if (order === null) {
+  if (!order) {
     return null;
   }
 
@@ -111,7 +127,7 @@ export function saveOrderUpdate(eventData: EventData2): Order | null {
 
   let order = Order.load(key);
 
-  if (order === null) {
+  if (!order) {
     return null;
   }
 
@@ -125,12 +141,14 @@ export function saveOrderUpdate(eventData: EventData2): Order | null {
   return order as Order;
 }
 
-export function saveOrderSizeDeltaAutoUpdate(eventData: EventData1): Order | null {
+export function saveOrderSizeDeltaAutoUpdate(
+  eventData: EventData1
+): Order | null {
   let key = eventData.getBytes32Item("key")!.toHexString();
 
   let order = Order.load(key);
 
-  if (order === null) {
+  if (!order) {
     return null;
   }
 
@@ -141,16 +159,20 @@ export function saveOrderSizeDeltaAutoUpdate(eventData: EventData1): Order | nul
   return order as Order;
 }
 
-export function saveOrderCollateralAutoUpdate(eventData: EventData1): Order | null {
+export function saveOrderCollateralAutoUpdate(
+  eventData: EventData1
+): Order | null {
   let key = eventData.getBytes32Item("key")!.toHexString();
 
   let order = Order.load(key);
 
-  if (order === null) {
+  if (!order) {
     return null;
   }
 
-  order.initialCollateralDeltaAmount = eventData.getUintItem("nextCollateralDeltaAmount")!;
+  order.initialCollateralDeltaAmount = eventData.getUintItem(
+    "nextCollateralDeltaAmount"
+  )!;
 
   order.save();
 

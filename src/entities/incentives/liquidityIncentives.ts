@@ -267,7 +267,7 @@ function _saveGlpGmMigrationStat(diff: EligibleRedemptionDiffResult): void {
 function _getOrCreateGlpGmMigrationStat(): GlpGmMigrationStat {
   let id = "total";
   let entity = GlpGmMigrationStat.load(id);
-  if (entity=== null) {
+  if (!entity) {
     entity = new GlpGmMigrationStat(id);
     entity.eligibleRedemptionUsd = ZERO;
     entity.eligibleRedemptionInArb = ZERO;
@@ -281,7 +281,7 @@ function _getOrCreateUserGlpGmMigrationStatGlpData(account: string, timestamp: i
   let id = account + ":" + period + ":" + startTimestamp.toString();
   let entity = UserGlpGmMigrationStat.load(id);
 
-  if (entity=== null) {
+  if (!entity) {
     entity = new UserGlpGmMigrationStat(id);
     entity.period = period;
     entity.account = account;
@@ -307,7 +307,7 @@ function _getOrCreateLiquidityProviderIncentivesStat(
   let startTimestamp = timestampToPeriodStart(timestamp, period);
   let id = account + ":" + marketAddress + ":" + period + ":" + startTimestamp.toString();
   let entity = LiquidityProviderIncentivesStat.load(id);
-  if (entity=== null) {
+  if (!entity) {
     entity = new LiquidityProviderIncentivesStat(id);
     entity.timestamp = startTimestamp;
     entity.period = period;
@@ -329,7 +329,7 @@ function _getOrCreateMarketIncentivesStat(marketAddress: string, timestamp: i32)
   let id = marketAddress + ":" + period + ":" + startTimestamp.toString();
   let entity = MarketIncentivesStat.load(id);
 
-  if (entity=== null) {
+  if (!entity) {
     entity = new MarketIncentivesStat(id);
     entity.timestamp = startTimestamp;
     entity.period = period;
@@ -348,7 +348,7 @@ function _getUserMarketInfo(account: string, marketAddress: string): UserMarketI
   let id = account + ":" + marketAddress;
   let entity = UserMarketInfo.load(id);
 
-  if (entity=== null) {
+  if (!entity) {
     entity = new UserMarketInfo(id);
     entity.marketTokensBalance = ZERO;
     entity.account = account;

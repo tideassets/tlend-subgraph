@@ -16,11 +16,10 @@ export function getOrCreateTransaction(event: ethereum.Event): Transaction {
     entity.blockNumber = event.block.number.toI32();
     entity.transactionIndex = event.transaction.index.toI32();
     entity.from = event.transaction.from.toHexString();
-    let to = event.transaction.to;
-    if (to) {
-      entity.to = to.toHexString();
-    } else {
+    if (!event.transaction.to) {
       entity.to = "";
+    } else {
+      entity.to = event.transaction.to!.toHexString();
     }
     entity.save();
   }

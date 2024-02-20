@@ -1,9 +1,20 @@
 import { Bytes, log } from "@graphprotocol/graph-ts";
 
-import { EventLog, EventLog1, EventLog2, EventLogEventDataStruct } from "../generated/EventEmitter/EventEmitter";
+import {
+  EventLog,
+  EventLog1,
+  EventLog2,
+  EventLogEventDataStruct,
+} from "../generated/EventEmitter/EventEmitter";
 import { Transfer } from "../generated/templates/MarketTokenTemplate/MarketToken";
 import { MarketTokenTemplate } from "../generated/templates";
-import { ClaimRef, DepositRef, MarketInfo, Order, SellUSDG } from "../generated/schema";
+import {
+  ClaimRef,
+  DepositRef,
+  MarketInfo,
+  Order,
+  SellUSDG,
+} from "../generated/schema";
 import { BatchSend } from "../generated/BatchSender/BatchSender";
 import { SellUSDG as SellUSDGEvent } from "../generated/Vault/Vault";
 import { RemoveLiquidity } from "../generated/GlpManager/GlpManager";
@@ -26,7 +37,11 @@ import {
   saveSwapFeesInfo,
   saveSwapFeesInfoWithPeriod,
 } from "./entities/fees";
-import { getMarketInfo, saveMarketInfo, saveMarketInfoTokensSupply } from "./entities/markets";
+import {
+  getMarketInfo,
+  saveMarketInfo,
+  saveMarketInfoTokensSupply,
+} from "./entities/markets";
 import {
   orderTypes,
   saveOrder,
@@ -37,7 +52,10 @@ import {
   saveOrderSizeDeltaAutoUpdate,
   saveOrderUpdate,
 } from "./entities/orders";
-import { savePositionDecrease, savePositionIncrease } from "./entities/positions";
+import {
+  savePositionDecrease,
+  savePositionIncrease,
+} from "./entities/positions";
 import { getTokenPrice, handleOraclePriceUpdate } from "./entities/prices";
 import { handleSwapInfo as saveSwapInfo } from "./entities/swaps";
 import {
@@ -49,7 +67,11 @@ import {
   savePositionIncreaseExecutedTradeAction,
   saveSwapExecutedTradeAction,
 } from "./entities/trades";
-import { savePositionVolumeInfo, saveSwapVolumeInfo, saveVolumeInfo } from "./entities/volume";
+import {
+  savePositionVolumeInfo,
+  saveSwapVolumeInfo,
+  saveVolumeInfo,
+} from "./entities/volume";
 import { EventData } from "./utils/eventData";
 import { EventData1 } from "./utils/eventData1";
 import { EventData2 } from "./utils/eventData2";
@@ -80,12 +102,12 @@ export function handleSellUSDG(event: SellUSDGEvent): void {
 
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
   let sellUsdgEntity = SellUSDG.load(SELL_USDG_ID);
-
-  if (!sellUsdgEntity ) {
-    log.error("No SellUSDG entity tx: {}", [event.transaction.hash.toHexString()]);
+  if (!sellUsdgEntity) {
+    log.error("No SellUSDG entity tx: {}", [
+      event.transaction.hash.toHexString(),
+    ]);
     throw new Error("No SellUSDG entity");
   }
-
   if (sellUsdgEntity.txHash != event.transaction.hash.toHexString()) {
     log.error("SellUSDG entity tx hashes don't match: expected {} actual {}", [
       event.transaction.hash.toHexString(),
@@ -93,7 +115,6 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
     ]);
     throw new Error("SellUSDG entity tx hashes don't match");
   }
-
   let expectedLogIndex = event.logIndex.toI32() - 1;
   if (sellUsdgEntity.logIndex != expectedLogIndex) {
     log.error("SellUSDG entity incorrect log index: expected {} got {}", [
@@ -102,12 +123,11 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
     ]);
     throw new Error("SellUSDG entity tx hashes don't match");
   }
-
   saveUserGlpGmMigrationStatGlpData(
     event.params.account.toHexString(),
     event.block.timestamp.toI32(),
     event.params.usdgAmount,
-    sellUsdgEntity.feeBasisPoints,
+    sellUsdgEntity.feeBasisPoints
   );
 }
 
@@ -125,7 +145,7 @@ export function handleBatchSend(event: BatchSend): void {
       typeId.toI32(),
       event.transaction.hash.toHexString(),
       event.block.number.toI32(),
-      event.block.timestamp.toI32(),
+      event.block.timestamp.toI32()
     );
   }
 }
@@ -135,37 +155,61 @@ export function handleMarketTokenTransfer(event: Transfer): void {
   let from = event.params.from.toHexString();
   let to = event.params.to.toHexString();
   let value = event.params.value;
-
   // `from` user redeems or transfers out GM tokens
   if (from != ADDRESS_ZERO) {
     // LiquidityProviderIncentivesStat *should* be updated before UserMarketInfo
-    saveLiquidityProviderIncentivesStat(from, marketAddress, "1w", value.neg(), event.block.timestamp.toI32());
+    saveLiquidityProviderIncentivesStat(
+      from,
+      marketAddress,
+      "1w",
+      value.neg(),
+      event.block.timestamp.toI32()
+    );
     saveUserMarketInfo(from, marketAddress, value.neg());
     let transaction = getOrCreateTransaction(event);
-    saveUserGmTokensBalanceChange(from, marketAddress, value.neg(), transaction, event.logIndex);
+    saveUserGmTokensBalanceChange(
+      from,
+      marketAddress,
+      value.neg(),
+      transaction,
+      event.logIndex
+    );
   }
-
   // `to` user receives GM tokens
   if (to != ADDRESS_ZERO) {
     // LiquidityProviderIncentivesStat *should* be updated before UserMarketInfo
-    saveLiquidityProviderIncentivesStat(to, marketAddress, "1w", value, event.block.timestamp.toI32());
+    saveLiquidityProviderIncentivesStat(
+      to,
+      marketAddress,
+      "1w",
+      value,
+      event.block.timestamp.toI32()
+    );
     saveUserMarketInfo(to, marketAddress, value);
     let transaction = getOrCreateTransaction(event);
-    saveUserGmTokensBalanceChange(to, marketAddress, value, transaction, event.logIndex);
+    saveUserGmTokensBalanceChange(
+      to,
+      marketAddress,
+      value,
+      transaction,
+      event.logIndex
+    );
   }
-
   if (from == ADDRESS_ZERO) {
     saveMarketInfoTokensSupply(marketAddress, value);
   }
-
   if (to == ADDRESS_ZERO) {
     saveMarketInfoTokensSupply(marketAddress, value.neg());
   }
 }
 
-export function handleEventLog(event: EventLog): void {
+export function handleEventLog(event: EventLog2): void {
   let eventName = event.params.eventName;
-  let eventData = new EventData(event.params.eventData as EventLogEventDataStruct);
+  let eventData = new EventData2(event.params.eventData);
+  if (eventName == "DepositExecuted") {
+    handleDepositExecuted(event as EventLog2, eventData);
+    return;
+  }
 }
 
 function handleEventLog1(event: EventLog1, network: string): void {
@@ -212,9 +256,15 @@ function handleEventLog1(event: EventLog1, network: string): void {
     let feeAmountForPool = eventData.getUintItem("feeAmountForPool")!;
     let amountAfterFees = eventData.getUintItem("amountAfterFees")!;
     let action = getSwapActionByFeeType(swapFeesInfo.swapFeeType);
-    let totalAmountIn = amountAfterFees.plus(feeAmountForPool).plus(feeReceiverAmount);
+    let totalAmountIn = amountAfterFees
+      .plus(feeAmountForPool)
+      .plus(feeReceiverAmount);
     let volumeUsd = totalAmountIn.times(tokenPrice);
-    let poolValue = getMarketPoolValueFromContract(swapFeesInfo.marketAddress, network, transaction);
+    let poolValue = getMarketPoolValueFromContract(
+      swapFeesInfo.marketAddress,
+      network,
+      transaction
+    );
     // only deposits and withdrawals affect marketTokensSupply, for others we may use cached value
     // be aware: getMarketTokensSupplyFromContract returns value by block number, i.e. latest value in block
     let marketTokensSupply = isDepositOrWithdrawalAction(action)
@@ -229,7 +279,12 @@ function handleEventLog1(event: EventLog1, network: string): void {
       marketTokensSupply
     );
     saveVolumeInfo(action, transaction.timestamp, volumeUsd);
-    saveSwapFeesInfoWithPeriod(feeAmountForPool, feeReceiverAmount, tokenPrice, transaction.timestamp);
+    saveSwapFeesInfoWithPeriod(
+      feeAmountForPool,
+      feeReceiverAmount,
+      tokenPrice,
+      transaction.timestamp
+    );
     return;
   }
 
@@ -244,11 +299,23 @@ function handleEventLog1(event: EventLog1, network: string): void {
   if (eventName == "PositionFeesCollected") {
     let transaction = getOrCreateTransaction(event);
     let positionFeeAmount = eventData.getUintItem("positionFeeAmount")!;
-    let positionFeeAmountForPool = eventData.getUintItem("positionFeeAmountForPool")!;
-    let collateralTokenPriceMin = eventData.getUintItem("collateralTokenPrice.min")!;
+    let positionFeeAmountForPool = eventData.getUintItem(
+      "positionFeeAmountForPool"
+    )!;
+    let collateralTokenPriceMin = eventData.getUintItem(
+      "collateralTokenPrice.min"
+    )!;
     let borrowingFeeUsd = eventData.getUintItem("borrowingFeeUsd")!;
-    let positionFeesInfo = savePositionFeesInfo(eventData, "PositionFeesCollected", transaction);
-    let poolValue = getMarketPoolValueFromContract(positionFeesInfo.marketAddress, network, transaction);
+    let positionFeesInfo = savePositionFeesInfo(
+      eventData,
+      "PositionFeesCollected",
+      transaction
+    );
+    let poolValue = getMarketPoolValueFromContract(
+      positionFeesInfo.marketAddress,
+      network,
+      transaction
+    );
     let marketInfo = getMarketInfo(positionFeesInfo.marketAddress);
 
     saveCollectedMarketFees(
@@ -284,7 +351,12 @@ function handleEventLog1(event: EventLog1, network: string): void {
 
     savePositionIncrease(eventData, transaction);
     saveVolumeInfo("margin", transaction.timestamp, sizeDeltaUsd);
-    savePositionVolumeInfo(transaction.timestamp, collateralToken, marketToken, sizeDeltaUsd);
+    savePositionVolumeInfo(
+      transaction.timestamp,
+      collateralToken,
+      marketToken,
+      sizeDeltaUsd
+    );
     saveUserStat("margin", account, transaction.timestamp);
     return;
   }
@@ -298,7 +370,12 @@ function handleEventLog1(event: EventLog1, network: string): void {
 
     savePositionDecrease(eventData, transaction);
     saveVolumeInfo("margin", transaction.timestamp, sizeDeltaUsd);
-    savePositionVolumeInfo(transaction.timestamp, collateralToken, marketToken, sizeDeltaUsd);
+    savePositionVolumeInfo(
+      transaction.timestamp,
+      collateralToken,
+      marketToken,
+      sizeDeltaUsd
+    );
     saveUserStat("margin", account, transaction.timestamp);
     return;
   }
@@ -380,13 +457,20 @@ function handleEventLog2(event: EventLog2, network: string): void {
       return;
     }
 
-    if (order.orderType == orderTypes.get("MarketSwap") || order.orderType == orderTypes.get("LimitSwap")) {
+    if (
+      order.orderType == orderTypes.get("MarketSwap") ||
+      order.orderType == orderTypes.get("LimitSwap")
+    ) {
       saveSwapExecutedTradeAction(eventId, order as Order, transaction);
     } else if (
       order.orderType == orderTypes.get("MarketIncrease") ||
       order.orderType == orderTypes.get("LimitIncrease")
     ) {
-      savePositionIncreaseExecutedTradeAction(eventId, order as Order, transaction);
+      savePositionIncreaseExecutedTradeAction(
+        eventId,
+        order as Order,
+        transaction
+      );
     } else if (
       order.orderType == orderTypes.get("MarketDecrease") ||
       order.orderType == orderTypes.get("LimitDecrease") ||
@@ -396,7 +480,11 @@ function handleEventLog2(event: EventLog2, network: string): void {
       if (ClaimRef.load(order.id)) {
         saveClaimActionOnOrderExecuted(transaction, eventData);
       } else {
-        savePositionDecreaseExecutedTradeAction(eventId, order as Order, transaction);
+        savePositionDecreaseExecutedTradeAction(
+          eventId,
+          order as Order,
+          transaction
+        );
       }
     }
     return;
@@ -426,7 +514,7 @@ function handleEventLog2(event: EventLog2, network: string): void {
     let transaction = getOrCreateTransaction(event);
     let order = saveOrderUpdate(eventData);
     if (order !== null) {
-      saveOrderUpdatedTradeAction(eventId, order, transaction);
+      saveOrderUpdatedTradeAction(eventId, order as Order, transaction);
     }
 
     return;
@@ -442,7 +530,7 @@ function handleEventLog2(event: EventLog2, network: string): void {
 
     saveOrderFrozenTradeAction(
       eventId,
-      order,
+      order as Order,
       order.frozenReason as string,
       order.frozenReasonBytes as Bytes,
       transaction
@@ -460,7 +548,9 @@ function handleDepositCreated(event: EventLog2, eventData: EventData2): void {
   let account = eventData.getAddressItemString("account")!;
   saveUserStat("deposit", account, transaction.timestamp);
 
-  let depositRef = new DepositRef(eventData.getBytes32Item("key")!.toHexString());
+  let depositRef = new DepositRef(
+    eventData.getBytes32Item("key")!.toHexString()
+  );
   depositRef.marketAddress = eventData.getAddressItemString("market")!;
 
   // old DepositCreated event does not contain "account"
@@ -479,8 +569,14 @@ function handleDepositExecuted(event: EventLog2, eventData: EventData2): void {
   let shortTokenAmount = eventData.getUintItem("shortTokenAmount")!;
   let shortTokenPrice = getTokenPrice(marketInfo.shortToken)!;
 
-  let depositUsd = longTokenAmount.times(longTokenPrice).plus(shortTokenAmount.times(shortTokenPrice));
-  saveUserGlpGmMigrationStatGmData(depositRef.account, event.block.timestamp.toI32(), depositUsd);
+  let depositUsd = longTokenAmount
+    .times(longTokenPrice)
+    .plus(shortTokenAmount.times(shortTokenPrice));
+  saveUserGlpGmMigrationStatGmData(
+    depositRef.account,
+    event.block.timestamp.toI32(),
+    depositUsd
+  );
 }
 
 export function handleEventLog1Arbitrum(event: EventLog1): void {

@@ -2,19 +2,22 @@
   "name": "gmx",
   "license": "UNLICENSED",
   "scripts": {
-    "codegen": "graph codegen ./subgraph-arbitrumSepolia.yaml",
-    "build": "graph build ./subgraph-arbitrumSepolia.yaml",
+    "codegen": "graph codegen ./subgraph.yaml",
+    "build": "graph build ./subgraph.yaml",
     "deploy-satsuma:fuji": "graph deploy synthetics-fuji-stats ./subgraph-fuji.yaml --version-label $(git rev-parse --abbrev-ref HEAD)-$(date '+%y%m%d%H%M%S')-$(git rev-parse --short HEAD) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --ipfs https://ipfs.satsuma.xyz --deploy-key $(cat .satsuma_token)",
     "deploy-satsuma:goerli": "graph deploy synthetics-goerli-stats ./subgraph-goerli.yaml --version-label $(git rev-parse --abbrev-ref HEAD)-$(date '+%y%m%d%H%M%S')-$(git rev-parse --short HEAD) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --ipfs https://ipfs.satsuma.xyz --deploy-key $(cat .satsuma_token)",
     "deploy-satsuma:arbitrum": "graph deploy synthetics-arbitrum-stats ./subgraph-arbitrum.yaml --version-label $(git rev-parse --abbrev-ref HEAD)-$(date '+%y%m%d%H%M%S')-$(git rev-parse --short HEAD) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --ipfs https://ipfs.satsuma.xyz --deploy-key $(cat .satsuma_token)",
     "deploy-satsuma:sepolia": "graph deploy synthetics-arbitrumSepolia-stats ./subgraph-arbitrumSepolia.yaml --version-label $(git rev-parse --abbrev-ref HEAD)-$(date '+%y%m%d%H%M%S')-$(git rev-parse --short HEAD) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --ipfs https://ipfs.satsuma.xyz --deploy-key $(cat .satsuma_token)",
     "deploy-satsuma:avalanche": "graph deploy synthetics-avalanche-stats ./subgraph-avalanche.yaml --version-label $(git rev-parse --abbrev-ref HEAD)-$(date '+%y%m%d%H%M%S')-$(git rev-parse --short HEAD) --node https://subgraphs.alchemy.com/api/subgraphs/deploy --ipfs https://ipfs.satsuma.xyz --deploy-key $(cat .satsuma_token)",
-    "deploy-satsuma:all": "yarn deploy-satsuma:fuji && yarn deploy-satsuma:arbitrum && yarn deploy-satsuma:avalanche"
+    "deploy-satsuma:all": "yarn deploy-satsuma:fuji && yarn deploy-satsuma:arbitrum && yarn deploy-satsuma:avalanche",
+    "create-local": "graph create example --node http://127.0.0.1:8020",
+    "deploy-local": "graph deploy example --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.67.2",
     "@graphprotocol/graph-ts": "0.32.0",
     "ethers": "^5.4.6",
-    "moment": "^2.29.1"
+    "moment": "^2.29.1",
+    "source-map-support": "^0.5.21"
   }
 }

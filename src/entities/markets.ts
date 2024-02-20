@@ -1,7 +1,6 @@
 import { log, BigInt } from "@graphprotocol/graph-ts";
 import { MarketInfo } from "../../generated/schema";
 import { marketConfigs } from "../config/markets";
-import { EventData } from "../utils/eventData";
 import { EventData1 } from "../utils/eventData1";
 
 let ZERO = BigInt.fromI32(0);
@@ -41,7 +40,10 @@ export function getMarketInfo(marketAddress: string): MarketInfo {
   return entity!;
 }
 
-export function saveMarketInfoTokensSupply(marketAddress: string, value: BigInt): void {
+export function saveMarketInfoTokensSupply(
+  marketAddress: string,
+  value: BigInt
+): void {
   let marketInfo = getMarketInfo(marketAddress);
   marketInfo.marketTokensSupply = marketInfo.marketTokensSupply.plus(value);
   marketInfo.save();

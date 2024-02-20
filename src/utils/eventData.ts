@@ -3,19 +3,21 @@ import {
   EventLogEventDataAddressItemsItemsStruct,
   EventLogEventDataUintItemsItemsStruct,
   EventLogEventDataStruct,
-  EventLog1EventDataStruct,
   EventLogEventDataAddressItemsArrayItemsStruct,
   EventLogEventDataUintItemsArrayItemsStruct,
   EventLogEventDataBytesItemsItemsStruct,
   EventLogEventDataBytesItemsArrayItemsStruct,
-  EventLogEventDataStringItemsArrayItemsStruct
+  EventLogEventDataStringItemsArrayItemsStruct,
 } from "../../generated/EventEmitter/EventEmitter";
 
 export class EventData {
   constructor(public rawData: EventLogEventDataStruct) {}
 
   getAddressItem(key: string): Address | null {
-    return getItemByKey<Address, EventLogEventDataAddressItemsItemsStruct>(this.rawData.addressItems.items, key);
+    return getItemByKey<Address, EventLogEventDataAddressItemsItemsStruct>(
+      this.rawData.addressItems.items,
+      key
+    );
   }
 
   getAddressItemString(key: string): string | null {
@@ -29,10 +31,10 @@ export class EventData {
   }
 
   getAddressArrayItem(key: string): Array<Address> | null {
-    return getItemByKey<Array<Address>, EventLogEventDataAddressItemsArrayItemsStruct>(
-      this.rawData.addressItems.arrayItems,
-      key
-    );
+    return getItemByKey<
+      Array<Address>,
+      EventLogEventDataAddressItemsArrayItemsStruct
+    >(this.rawData.addressItems.arrayItems, key);
   }
 
   getAddressArrayItemString(key: string): Array<string> | null {
@@ -65,60 +67,68 @@ export class EventData {
   }
 
   getStringArrayItem(key: string): Array<string> | null {
-    return getItemByKey<Array<string>, EventLogEventDataStringItemsArrayItemsStruct>(
-      this.rawData.stringItems.arrayItems,
-      key
-    );
+    return getItemByKey<
+      Array<string>,
+      EventLogEventDataStringItemsArrayItemsStruct
+    >(this.rawData.stringItems.arrayItems, key);
   }
 
   getUintItem(key: string): BigInt | null {
-    return getItemByKey<BigInt, EventLogEventDataUintItemsItemsStruct>(this.rawData.uintItems.items, key);
+    return getItemByKey<BigInt, EventLogEventDataUintItemsItemsStruct>(
+      this.rawData.uintItems.items,
+      key
+    );
   }
 
   getUintArrayItem(key: string): Array<BigInt> | null {
-    return getItemByKey<Array<BigInt>, EventLogEventDataUintItemsArrayItemsStruct>(
-      this.rawData.uintItems.arrayItems,
-      key
-    );
+    return getItemByKey<
+      Array<BigInt>,
+      EventLogEventDataUintItemsArrayItemsStruct
+    >(this.rawData.uintItems.arrayItems, key);
   }
 
   getIntItem(key: string): BigInt | null {
     return getItemByKey<BigInt, EventLogEventDataUintItemsItemsStruct>(
-      this.rawData.intItems.items as Array<EventLogEventDataUintItemsItemsStruct>,
+      this.rawData.intItems
+        .items as Array<EventLogEventDataUintItemsItemsStruct>,
       key
     );
   }
 
   getIntArrayItem(key: string): Array<BigInt> | null {
-    return getItemByKey<Array<BigInt>, EventLogEventDataUintItemsArrayItemsStruct>(
-      this.rawData.intItems.arrayItems,
-      key
-    );
+    return getItemByKey<
+      Array<BigInt>,
+      EventLogEventDataUintItemsArrayItemsStruct
+    >(this.rawData.intItems.arrayItems, key);
   }
 
   getBytesItem(key: string): Bytes | null {
-    return getItemByKey<Bytes, EventLogEventDataBytesItemsItemsStruct>(this.rawData.bytesItems.items, key);
+    return getItemByKey<Bytes, EventLogEventDataBytesItemsItemsStruct>(
+      this.rawData.bytesItems.items,
+      key
+    );
   }
 
   getBytesArrayItem(key: string): Array<Bytes> | null {
-    return getItemByKey<Array<Bytes>, EventLogEventDataBytesItemsArrayItemsStruct>(
-      this.rawData.bytesItems.arrayItems,
-      key
-    );
+    return getItemByKey<
+      Array<Bytes>,
+      EventLogEventDataBytesItemsArrayItemsStruct
+    >(this.rawData.bytesItems.arrayItems, key);
   }
 
   getBytes32Item(key: string): Bytes | null {
     return getItemByKey<Bytes, EventLogEventDataBytesItemsItemsStruct>(
-      this.rawData.bytes32Items.items as Array<EventLogEventDataBytesItemsItemsStruct>,
+      this.rawData.bytes32Items
+        .items as Array<EventLogEventDataBytesItemsItemsStruct>,
       key
     );
   }
 
   getBytes32ArrayItem(key: string): Array<Bytes> | null {
-    return getItemByKey<Array<Bytes>, EventLogEventDataBytesItemsArrayItemsStruct>(
-      this.rawData.bytes32Items.arrayItems,
-      key
-    );
+    return getItemByKey<
+      Array<Bytes>,
+      EventLogEventDataBytesItemsArrayItemsStruct
+    >(this.rawData.bytes32Items.arrayItems, key);
   }
 
   // boolean type is not nullable in AssemblyScript, so we return false if the key is not found
@@ -145,7 +155,10 @@ class EventDataItem<T> extends ethereum.Tuple {
   }
 }
 
-function getItemByKey<T, TItem extends EventDataItem<T>>(items: Array<TItem>, key: string): T | null {
+function getItemByKey<T, TItem extends EventDataItem<T>>(
+  items: Array<TItem>,
+  key: string
+): T | null {
   for (let i = 0; i < items.length; i++) {
     if (items[i].key == key) {
       return items[i].value;

@@ -6,7 +6,7 @@ import {
   Reader__getMarketTokenPriceInputLongTokenPriceStruct,
   Reader__getMarketTokenPriceInputMarketStruct,
   Reader__getMarketTokenPriceInputShortTokenPriceStruct
-} from "../../generated/EventEmitter/Reader";
+} from "./Reader";
 import { MarketInfo, TokenPrice, Transaction } from "../../generated/schema";
 import { getReaderContractConfigByNetwork } from "./readerConfigs";
 import { getMarketInfo } from "../entities/markets";
@@ -37,20 +37,14 @@ export function getMarketPoolValueFromContract(
   marketArg[2] = chainEthereum.Value.fromAddress(Address.fromString(marketInfo.longToken));
   marketArg[3] = chainEthereum.Value.fromAddress(Address.fromString(marketInfo.shortToken));
 
-  let indexPriceArg = new Reader__getMarketTokenPriceInputIndexTokenPriceStruct(2);
   let indexTokenPriceArg = createPriceForContractCall<Reader__getMarketTokenPriceInputIndexTokenPriceStruct>(
-    marketInfo.indexToken,
-    indexPriceArg
+    marketInfo.indexToken, new Reader__getMarketTokenPriceInputIndexTokenPriceStruct(2)
   );
-  let longPriceArg = new Reader__getMarketTokenPriceInputLongTokenPriceStruct(2);
   let longTokenPriceArg = createPriceForContractCall<Reader__getMarketTokenPriceInputLongTokenPriceStruct>(
-    marketInfo.longToken,
-    longPriceArg
+    marketInfo.longToken, new Reader__getMarketTokenPriceInputLongTokenPriceStruct(2)
   );
-  let shortPriceArg = new Reader__getMarketTokenPriceInputShortTokenPriceStruct(2);
   let shortTokenPriceArg = createPriceForContractCall<Reader__getMarketTokenPriceInputShortTokenPriceStruct>(
-    marketInfo.shortToken,
-    shortPriceArg
+    marketInfo.shortToken, new Reader__getMarketTokenPriceInputShortTokenPriceStruct(2)
   );
 
   /*
@@ -102,5 +96,5 @@ function createPriceForContractCall<T>(tokenAddress: string, price: T): T {
   price[0] = chainEthereum.Value.fromUnsignedBigInt(minPrice);
   price[1] = chainEthereum.Value.fromUnsignedBigInt(maxPrice);
 
-  return price;
+  return price as T;
 }

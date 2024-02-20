@@ -14,7 +14,7 @@ export function saveDistribution(
   let id = receiver + ":" + txHash + ":" + typeId.toString();
   let entity = Distribution.load(id);
 
-  if (entity === null) {
+  if (!entity ) {
     entity = new Distribution(id);
     entity.tokens = new Array<string>(0);
     entity.amounts = new Array<BigInt>(0);
